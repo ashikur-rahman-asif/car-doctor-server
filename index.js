@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const express = require('express')
+const jwt= require('jsonwebtoken')
 const cors = require('cors');
 const app = express()
 const port = process.env.PORT || 5000
@@ -30,7 +31,18 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
       await client.connect();
     const serviceCollection = client.db('car-doctor').collection('services')
-    const bookingCollection= client.db('car-doctor').collection('booking-data')
+    const bookingCollection = client.db('car-doctor').collection('booking-data')
+    
+    // jwt
+
+    app.post('/jwt', (req, res) => {
+      const user = req.body
+      console.log(user)
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1hr' });
+      res.send({token})
+    })
+
+    // service 
       app.get('/services', async (req, res) => {
           const cursor = serviceCollection.find()
           const result = await cursor.toArray()
